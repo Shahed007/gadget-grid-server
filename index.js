@@ -39,7 +39,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res)=>{
-  res.send('MY brand shop api was coming soon!');
+  res.send('MY brand shop api was coming sooooon!');
 })
 
 app.listen(port, ()=>{
