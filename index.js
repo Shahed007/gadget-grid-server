@@ -9,7 +9,6 @@ app.use(cors());
 app.use(express.json());
 
 
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster1.77jbz4j.mongodb.net/?retryWrites=true&w=majority`;
 
 
@@ -26,16 +25,33 @@ async function run() {
     
     const tecWandersDB = client.db("tecWandersDB");
     const userCollection = tecWandersDB.collection("users");
-    await client.connect();
+
+    app.get('/users', async(req, res)=> {
+      const cursor = userCollection.find();
+      const users = await cursor.toArray();
+      res.send(users);
+    })
 
     app.post('/users', async(req, res)=>{
       const user = req.body;
       const result = await userCollection.insertOne(user);
       res.send(result);
     })
+
+    app.patch('/users', async(req, res)=> {
+      const user = req.body;
+      const filter = { email: user.email };
+      const updateDoc = {
+        $set: {
+          email: user.email,
+          lastSignInTime: user.lastSignInTime
+        },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    })
     
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+   
   } finally {
     // await client.close();
   }
