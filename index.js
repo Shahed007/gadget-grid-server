@@ -25,6 +25,7 @@ async function run() {
     
     const tecWandersDB = client.db("tecWandersDB");
     const userCollection = tecWandersDB.collection("users");
+    const brandCollection = tecWandersDB.collection("brand")
 
     app.get('/users', async(req, res)=> {
       const cursor = userCollection.find();
@@ -49,6 +50,12 @@ async function run() {
       };
       const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
+    })
+
+    app.get('/brand', async(req, res)=>{
+      const cursor = brandCollection.find();
+      const brand = await cursor.toArray();
+      res.send(brand);
     })
     
    
