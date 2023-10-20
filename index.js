@@ -25,7 +25,8 @@ async function run() {
     
     const tecWandersDB = client.db("tecWandersDB");
     const userCollection = tecWandersDB.collection("users");
-    const brandCollection = tecWandersDB.collection("brand")
+    const brandCollection = tecWandersDB.collection("brand");
+    const productsCollection = tecWandersDB.collection("products");
 
     app.get('/users', async(req, res)=> {
       const cursor = userCollection.find();
@@ -37,6 +38,22 @@ async function run() {
       const user = req.body;
       const result = await userCollection.insertOne(user);
       res.send(result);
+    })
+
+    app.post('/products', async(req, res)=>{
+
+      const {brandName, image, typeOfProducts, productsName, price,ratting,description  } = req.body;
+
+      const doc = {
+        brandName,
+        image,
+        category: typeOfProducts,
+        products:  [productsName, price, ratting, description]
+        
+      }
+
+      const products = await productsCollection.insertOne(doc);
+      res.send(products);
     })
 
     app.patch('/users', async(req, res)=> {
@@ -57,6 +74,22 @@ async function run() {
       const brand = await cursor.toArray();
       res.send(brand);
     })
+
+    app.get('/products', async(req, res)=>{
+      const cursor = productsCollection.find();
+      const products = await cursor.toArray();
+      res.send(products);
+    })
+
+    app.get('/products/:name', async(req, res)=>{
+      const name = req.params.name;
+      const query = { brandName: name };
+      const cursor = productsCollection.find(query);
+      const products = await cursor.toArray();
+      res.send(products);
+    })
+
+    
     
    
   } finally {
