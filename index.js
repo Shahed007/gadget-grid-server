@@ -27,6 +27,7 @@ async function run() {
     const userCollection = tecWandersDB.collection("users");
     const brandCollection = tecWandersDB.collection("brand");
     const productsCollection = tecWandersDB.collection("products");
+    const cartCollection = tecWandersDB.collection('cart');
 
     app.get('/users', async(req, res)=> {
       const cursor = userCollection.find();
@@ -70,6 +71,13 @@ async function run() {
       res.send(result);
     })
 
+    app.post('/cart', async(req, res)=>{
+      const cart = req.body;
+      const result = await cartCollection.insertOne(cart);
+      res.send(result);
+    })
+
+    
     app.get('/brand', async(req, res)=>{
       const cursor = brandCollection.find();
       const brand = await cursor.toArray();
@@ -96,6 +104,28 @@ async function run() {
       const product = await productsCollection.findOne(query);
       res.send(product);
     })
+
+    app.put('/products/:id', async(req, res)=> {
+      const id = req.params.id;
+      const {brandName, image,specification, typeOfProducts, productsName, price,ratting,description  } = req.body;
+
+      const filter = {_id: new ObjectId(id)};
+      const options = { upsert: true };
+     
+
+      const updateDoc = {
+        $set: {
+        brandName,
+        image,
+        category: typeOfProducts,
+        products:  [productsName, price, ratting, description],
+        specification
+        },
+      };
+      const result = await productsCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    })
+
 
     
     
