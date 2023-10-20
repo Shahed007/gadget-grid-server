@@ -105,6 +105,12 @@ async function run() {
       res.send(product);
     })
 
+    app.get('/cart', async(req, res)=>{
+      const cursor = cartCollection.find();
+      const cart = await cursor.toArray();
+      res.send(cart);
+    })
+
     app.put('/products/:id', async(req, res)=> {
       const id = req.params.id;
       const {brandName, image,specification, typeOfProducts, productsName, price,ratting,description  } = req.body;
