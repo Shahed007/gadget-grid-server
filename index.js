@@ -45,6 +45,7 @@ async function run() {
 
       const {brandName, image,specification, typeOfProducts, productsName, price,ratting,description  } = req.body;
 
+      
       const doc = {
         brandName,
         image,
@@ -53,9 +54,17 @@ async function run() {
         specification
         
       }
-
-      const products = await productsCollection.insertOne(doc);
-      res.send(products);
+      const query = {products: doc.products[0]};
+      const isExist = await productsCollection.findOne(query);
+      if(isExist){
+        res.status(400).json({ error: 'Item already exist' });
+      }else{
+        const products = await productsCollection.insertOne(doc);
+        res.send(products);
+      }
+      
+      
+      
     })
 
     app.patch('/users', async(req, res)=> {
@@ -76,7 +85,7 @@ async function run() {
       const query = {products: cart.products[0]};
       const isExist = await cartCollection.findOne(query);
       if(isExist){
-        res.status(400).json({ error: 'Item already exists' });
+        res.status(400).json({ error: 'You have already added this item to cart' });
       }else{
         const result = await cartCollection.insertOne(cart);
         res.send(result);
