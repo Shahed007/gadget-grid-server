@@ -73,8 +73,15 @@ async function run() {
 
     app.post('/cart', async(req, res)=>{
       const cart = req.body;
-      const result = await cartCollection.insertOne(cart);
-      res.send(result);
+      const query = {products: cart.products[0]};
+      const isExist = await cartCollection.findOne(query);
+      if(isExist){
+        res.status(400).json({ error: 'Item already exists' });
+      }else{
+        const result = await cartCollection.insertOne(cart);
+        res.send(result);
+      }
+      
     })
 
     
@@ -105,6 +112,14 @@ async function run() {
       res.send(product);
     })
 
+    app.get('/cart/:uId', async(req, res)=>{
+      const uId = req.params.uId;
+      const query = {userUid: uId};
+      const cursor = cartCollection.find(query);
+      const cart = await cursor.toArray();
+      res.send(cart);
+    })
+
     app.get('/cart', async(req, res)=>{
       const cursor = cartCollection.find();
       const cart = await cursor.toArray();
@@ -129,6 +144,20 @@ async function run() {
         },
       };
       const result = await productsCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
+    })
+
+    app.delete('/cart/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    })
+
+    app.delete('/clearCart/:uId', async(req, res)=>{
+      const uId = req.params.uId;
+      const query = {userUid: uId};
+      const result = await cartCollection.deleteMany(query);
       res.send(result);
     })
 
